@@ -40,6 +40,17 @@ updated: 2026-10-26
 - Avoid music with prominent vocals under speech.
 - For loops (a seamless film loop), use a silent film or a track that loops cleanly.
 
+## Where to get music and SFX (verify-first)
+
+| Source | Good for | Watch out |
+|---|---|---|
+| YouTube Audio Library | YouTube videos | Some tracks require attribution; terms are for YouTube use |
+| Pixabay Music / SFX | Free commercial use under its licence | Read the current licence; content ID claims happen on popular tracks |
+| Freesound | SFX | Licence is per file (CC0, CC BY, CC BY-NC). NC files are not for paid work |
+| Paid subscriptions (Epidemic Sound, Artlist, Musicbed, Uppbeat Premium) | Client work, ads | Licence covers the subscriber's channels or projects; check client and paid-ad coverage |
+| Engine tools (HyperFrames `media-use` SFX set and music generation) | Drafts, own content | Check each model's licence; many music models are non-commercial |
+| Your own synthesised SFX | Anything | No licence risk |
+
 ## Licensing
 
 - Know the licence before you edit. Commercial and platform use differ from personal use.

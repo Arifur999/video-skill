@@ -1,111 +1,49 @@
 ---
-title: Remotion Core Manual
+title: Remotion Core Manual (House Notes)
 section: 04_SOFTWARE_MANUALS/remotion
 type: reference
 confidence: verify-first
-sources: [own-synthesis]
+sources: [remotion-repo, own-synthesis]
 updated: 2026-10-26
 ---
 
-# Remotion core manual
+# Remotion: house notes
 
-Remotion renders video from React components. A video is a function of the current frame.
+Remotion renders video from React components. A video is a function of the current frame. Facts below were read from `github.com/remotion-dev/remotion` (v4.0.539) on 2026-10-26. **The official skills are the authority for API details**; this file holds what we need to decide and the mistakes that cost renders.
 
-> Verify against the official docs (remotion.dev) for your installed version. APIs below are the long-stable core.
+## Licence first
 
-## Start
+Free for individuals, non-profits, and for-profit organisations with **up to 3 employees**. Anyone else needs a Company License (remotion.pro). Check `LICENSE.md` in the repo before client work and note the answer in the project's `notes.md`.
+
+## Setup
+
+- Official skills: `npx skills add remotion-dev/skills`. Start with `remotion-best-practices` (router); others include `remotion-create`, `remotion-markup` (rule files for transitions, timing, fonts, audio, SFX, voice-over, captions, 3D, motion blur), `remotion-captions`, `remotion-render`, `remotion-studio`, `remotion-multimedia`.
+- New project: `npx create-video@latest --yes --blank --no-tailwind <dir>`, then `npm i`.
+- Packages: `npx remotion add @remotion/media` (and `@remotion/transitions`, `@remotion/captions`, ...).
 
 ```bash
-npx create-video@latest
-npx remotion studio          # live preview
-npx remotion render <CompositionId> out/video.mp4
-npx remotion still <CompositionId> out/frame.png --frame=30
+npx remotion studio                                   # preview first
+npx remotion still <id> out/frame.png --frame=30      # check type and layout before a long render
+npx remotion render <id> out/frames --frames=0,30,90 --image-format=png
+npx remotion render <id> out/video.mp4                # only when the user asks for the render
 ```
 
-## The core idea
+## Rules that matter
 
-All motion must be derived from the frame number. **CSS animations and transitions will not render correctly.** Compute every value from `useCurrentFrame()`.
+1. **All motion from `useCurrentFrame()`.** CSS `transition`/`animation` and Tailwind animation classes do not render correctly. Call `useCurrentFrame()` in the smallest component that needs it.
+2. Convert seconds with `fps` from `useVideoConfig()`. Clamp `interpolate` with `extrapolateLeft/Right: "clamp"`.
+3. **Media:** `<Video>` and `<Audio>` now come from `@remotion/media` (prefer over `<OffthreadVideo>` for new work). `volume` can be a function of frame. Reverse playback is not supported. Files go in `public/` and load via `staticFile()`.
+4. **Duration from data:** `calculateMetadata` returns `durationInFrames`, `width`, `height`, `fps`, `props`. Use it for clip-length or transcript-driven videos instead of hard-coding.
+5. **Loading:** wait for fonts and data with `useDelayRender()` (`delayRender`/`continueRender`).
+6. **Transitions:** `@remotion/transitions` `<TransitionSeries>` with presentations from subpaths (`@remotion/transitions/fade`, `slide`, `wipe`, `flip`, `clock-wipe`) and `linearTiming`/`springTiming`. Transitions overlap scenes, so total length = sum of sequences − sum of transitions. `<TransitionSeries.Overlay>` (light leaks) does not shorten it.
+7. **Determinism:** no unseeded randomness or wall-clock time. Remotion ships a seeded `random(seed)` helper (verify in the docs for your version).
+8. Source video must be constant frame rate (convert VFR first; ffmpeg cookbook).
+9. Heavy blur and shadows slow renders; `@remotion/effects` provides blur, glow and vignette as effects.
 
-## Registering a composition
+## Fonts
 
-```tsx
-import { Composition } from "remotion";
-import { MyVideo } from "./MyVideo";
+`@remotion/google-fonts` or local fonts (see the `remotion-markup` rule files). For Bangla text load a Bengali font explicitly and test a still with conjuncts before animating.
 
-export const RemotionRoot = () => (
-  <Composition
-    id="MyVideo"
-    component={MyVideo}
-    durationInFrames={300}
-    fps={30}
-    width={1080}
-    height={1920}
-  />
-);
-```
+## Where it fits
 
-`registerRoot(RemotionRoot)` goes in the entry file. Each composition needs a unique `id`.
-
-## Essential building blocks
-
-| Item | Use |
-|---|---|
-| `useCurrentFrame()` | Current frame (relative inside a `<Sequence>`) |
-| `useVideoConfig()` | `fps`, `width`, `height`, `durationInFrames` |
-| `interpolate(frame, inputRange, outputRange, options)` | Map frame to a value. **Clamp** with `extrapolateLeft/Right: "clamp"` |
-| `spring({ frame, fps, config })` | Physics-based 0→1 curve. `damping: 200` gives no bounce |
-| `<AbsoluteFill>` | Full-frame layer |
-| `<Sequence from durationInFrames>` | Time-shift and limit children. Frames restart at 0 inside |
-| `<Series>` / `<Series.Sequence>` | Play children one after another |
-| `<OffthreadVideo src>` | Embed video in render (preferred over the plain video tag for rendering) |
-| `<Audio src volume>` | Add audio; `volume` can be a function of frame |
-| `<Img src>` | Image that waits for load before rendering |
-| `staticFile("name.mp4")` | Reference files in `public/` |
-| `calculateMetadata` | Set duration or size from data or the length of a clip |
-
-## Pattern: fade and rise in
-
-```tsx
-const frame = useCurrentFrame();
-const opacity = interpolate(frame, [0, 12], [0, 1], {
-  extrapolateLeft: "clamp",
-  extrapolateRight: "clamp",
-});
-const y = interpolate(frame, [0, 12], [30, 0], {
-  extrapolateLeft: "clamp",
-  extrapolateRight: "clamp",
-});
-return <div style={{ opacity, transform: `translateY(${y}px)` }}>Hello</div>;
-```
-
-## Pattern: word-by-word reveal
-
-Compute each word's start frame from its transcript timestamp (`Math.round(word.start * fps)`) and drive its opacity and transform from `frame - startFrame`. This keeps text tied to the audio.
-
-## Transitions package
-
-`@remotion/transitions` provides `TransitionSeries` with presentations such as `fade()`, `slide()`, `wipe()`, and `flip()`, and timing helpers like `linearTiming` and `springTiming`. Transitions overlap the two scenes, which shortens total duration. Account for that when you plan timing.
-
-## Fonts and assets
-
-- `@remotion/google-fonts` loads Google fonts in a render-safe way. For client work, prefer local fonts you have a licence for.
-- Put media in `public/`. Use `staticFile()`.
-- Wait for fonts before rendering (the package handles this).
-
-## Rendering tips
-
-- `--concurrency` controls parallel frames; lower it if memory is tight.
-- Output codec and quality options are set in CLI flags or the config file (`remotion.config.ts`).
-- For transparency, render to ProRes with alpha or a WebM with alpha, or PNG sequence.
-- Render a still of the key frame first to check type and layout before a long render.
-
-## Licensing
-
-Remotion's licence has company-size conditions. As of our last check, small teams (up to a few people) and individuals can use it free, and larger for-profit companies need a company licence. **Check the current terms on remotion.dev/license before using it for client work.** Record the answer in `05_RESEARCH_NOTES/`.
-
-## Gotchas
-
-- No `Math.random()` without a seed. Use the `random("seed")` helper that ships with Remotion.
-- Do not use `useEffect` timing for animation. Use the frame.
-- Heavy effects (large blur, big shadows) slow renders. Pre-render if needed.
-- Videos in the project must have a constant frame rate for exact sync. Convert variable frame rate sources first (see the ffmpeg cookbook).
+Use Remotion for React projects, data-driven batch videos (many variants from JSON), and when the user already has Remotion code. Otherwise HyperFrames is our default. Patterns for our video types: `remotion-patterns.md`.

@@ -20,6 +20,16 @@ updated: 2026-10-26
 | Square (feed) | 1080 × 1080 | 1:1 |
 | Portrait feed | 1080 × 1350 | 4:5 |
 
+## Safe zones
+
+App UI (username, caption text, buttons, progress bar) covers parts of the frame and changes with each app update. A conservative working box for 1080 × 1920 that clears Reels, TikTok and Shorts in their current layouts (verify on the platform before a paid campaign):
+
+- Keep key text, captions and faces out of the **top 250 px** and the **bottom 420 px**.
+- Keep them out of the **right 150 px** (like, comment and share buttons).
+- Inside that, the general rule still holds: content within 90% action-safe, text within 80% title-safe.
+
+Landscape (16:9): keep text inside the 80% title-safe box; YouTube end-screen elements cover the last 5-20 s in the centre and right.
+
 ## Frame rate
 
 - Match the source. Mixed frame rates cause judder.

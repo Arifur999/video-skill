@@ -61,4 +61,4 @@ See `03_AUDIO_ENGINEERING/sound-design/sfx-palette-rules.md` and `music-selectio
 
 ## Platform safe zones
 
-Platform UI covers parts of the frame (usernames, captions, buttons). Keep key text and faces out of the top and bottom bands. Exact pixel margins change as apps update, so keep a current figure in `04_SOFTWARE_MANUALS/` or the delivery specs, and verify before each project. Treat any specific number as `verify-first`.
+Platform UI covers parts of the frame (usernames, captions, buttons). Keep key text and faces out of the top and bottom bands and the right-hand button column. Working pixel margins are in `03_AUDIO_ENGINEERING/loudness-and-export/delivery-specs.md` (`verify-first`).

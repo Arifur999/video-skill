@@ -1,75 +1,72 @@
 ---
-title: HyperFrames Manual (HTML + GSAP Video)
+title: HyperFrames Manual (House Notes)
 section: 04_SOFTWARE_MANUALS/other-tools
 type: reference
 confidence: verify-first
-sources: [saas-motion-kit, herk-edit-kit]
+sources: [hyperframes-repo, saas-motion-kit, herk-edit-kit]
 updated: 2026-10-26
 ---
 
-# HyperFrames manual
+# HyperFrames: house notes
 
-HyperFrames (by HeyGen) lets an agent write video as HTML + GSAP and render it to MP4. Facts below come from how the two reference kits use it. **We have not read the HyperFrames docs directly.** Verify against `github.com/heygen-com/hyperframes` before relying on any detail.
+HyperFrames (HeyGen, Apache 2.0) renders plain HTML to video: headless Chrome seeks each frame, FFmpeg encodes. No build step. Built for agents.
 
-## Requirements (per the kits)
+Facts below were read from `github.com/heygen-com/hyperframes` (main) on 2026-10-26. **The official `hyperframes` skill is the authority for authoring rules.** This file holds only what we need to plan, the rules people break most, and how it fits our workflow.
 
-- Node.js 22 or newer
-- ffmpeg and ffprobe
-- A headless Chrome (HyperFrames downloads its own)
-- An agent that can use skills (Claude Code or Codex)
+## Setup
 
-## Install the HyperFrames skills
+- Needs Node 22+ and FFmpeg on PATH. Chrome: `npx hyperframes browser ensure`. Health check: `npx hyperframes doctor`.
+- Windows without FFmpeg: `winget install Gyan.FFmpeg`, then open a new terminal.
+- Official skills (install once):
+  - `npx skills add heygen-com/hyperframes`, or as a Claude Code plugin: `claude plugin marketplace add heygen-com/hyperframes`, then `claude plugin install hyperframes@hyperframes`
+  - Update: `npx hyperframes skills update`
+- Skills: `hyperframes` (read first: contract and work loop), `hyperframes-cli`, `hyperframes-registry` (about 450 blocks and components), `media-use` (TTS, transcribe, music, SFX, cutouts, grading, beats), `figma`, `slideshow`, `remotion-to-hyperframes`.
 
-```bash
-npx skills add heygen-com/hyperframes
-```
-
-## Everyday commands (as used in the kits)
+## Work loop
 
 ```bash
-npx hyperframes lint                       # check the project
-npx hyperframes preview                    # live preview in Studio
-npx hyperframes render --quality draft --output renders/draft.mp4
-npx hyperframes render --quality delivery --resolution landscape-4k --output renders/final-4k.mp4
-npx hyperframes add <block>                # install a registry block
+npx hyperframes init <dir> --resolution portrait     # landscape | portrait | square, -4k variants; --video/--audio to start from media
+npx hyperframes capture <url> -o <dir>                # pull a real website (brand, UI, copy) into a working folder
+npx hyperframes preview                               # Studio, port 3002
+npx hyperframes check --json                          # the gate: lint + runtime + layout + contrast. Fix every error
+npx hyperframes snapshot --review                     # PNGs of key frames + REVIEW.md. Look at them
+npx hyperframes render -q draft -o renders/draft.mp4
+npx hyperframes render -q high --resolution portrait-4k -o renders/final-4k.mp4
 ```
 
-Blocks mentioned in the kits include whip-pan, cross-warp-morph, flash-through-white, swirl-vortex, cinematic-zoom, chromatic-radial-split, and grain-overlay. Registry blocks give speed. A hand-built piece gives reference quality.
+- Render only after the user approves the preview or draft. After the final render, confirm `ffprobe` duration equals the root `data-duration`.
+- `lint`, `validate`, `inspect`, `layout` are older names; use `check`.
+- Render flags: `--format mp4|webm|mov|gif|png-sequence|hls`; `-q draft|looks|standard|high` (`looks` is default, CRF 16; `delivery` = `high`); `--resolution` supersamples to a preset (same aspect, whole multiple); `--fps`; `--crf`; `--workers` (about 256 MB each); `--docker --strict` for reproducible renders; `--variables`, `--batch rows.json` for variants.
+- Transparency: WebM or MOV (ProRes 4444) with `background: transparent` on the root.
 
-## Composition anatomy (from the kits)
+## Rules people break most
 
-- A stage element with a `data-composition-id`.
-- Each timed layer is an element with the `clip` class and these attributes: `data-start` (seconds), `data-duration` (seconds), `data-track-index` (layer order).
-- Animation is a **paused GSAP timeline** registered at `window.__timelines["<composition-id>"]`. The key must match the composition id exactly.
-- Audio elements are siblings in the root, each with an explicit `data-volume`.
-- Captions live outside the master composition, as body-level siblings, on high track numbers (20 and up), so they are not hidden by sub-composition timing.
+1. Every timed element: `class="clip"`, `data-start`, `data-duration` (seconds, local to the file). The root also needs `data-composition-id`, `data-duration` (the video length), `data-width`, `data-height`.
+2. One **paused** GSAP timeline per composition, registered after its tweens: `window.__timelines["<data-composition-id>"] = tl`. Never `tl.play()`, never add a scene timeline to the root.
+3. Forbidden: `Date.now()`, unseeded `Math.random()`, network fetches, timers, `repeat: -1`.
+4. Never tween `display`, `visibility` or `autoAlpha` on a `.clip`; animate a child. No CSS `transform` on an element GSAP also transforms. Use `fromTo` in scenes.
+5. Never play, pause or seek media yourself. A `<video>` with sound needs `data-has-audio="true"`, otherwise `muted`; add `playsinline`. Every `<audio>` needs an `id` or it is left out of the mix.
+6. `data-track-index` is only a Studio lane. Paint order is CSS `z-index`.
+7. An end state exactly at the end time is not rendered. Land it a frame earlier.
+8. A scene whose timeline ends early holds its last frame. A host slot shorter than its video goes blank (lint `subcomposition_blanks_before_host`): make each slot span its visible time.
+9. Scene host id = scene root id = timeline key. A mismatch makes every scene wait 45 s.
+10. Fonts: only the bundled families resolve by name (Inter, Montserrat, Poppins, Roboto, Open Sans, Lato, Oswald, Outfit, Nunito, Playfair Display, EB Garamond, JetBrains Mono and a few more). **No Bengali font is bundled**: add Noto Sans Bengali, Hind Siliguri or similar with `@font-face` in `assets/fonts/`.
+11. Asset paths are root-relative (`assets/...`), also inside scenes.
+12. No CSS filters on footage; use `media-treatment`.
+13. A 3 s+ stretch with no visible change fails `check` (`sweep_static`). This matches our "every shot moves" rule.
 
-## Rules that prevent the common failures
+Safe areas: content inside 90% action-safe, key text and captions inside 80% title-safe. Studio draws the guides.
 
-1. **Fill the slot.** End every timeline with a no-op tween that spans the full slot duration. Otherwise a sub-composition may be hidden early and flash black.
-2. **Seek-safe.** Everything is a function of time. No `Math.random()` or `Date.now()`. One paused timeline. Drive Three.js or canvas work from the seek event or a proxy tween.
-3. **Bracket video.** Use a poster still before and a last-frame still after any `<video>`.
-4. **Tween end times on frame boundaries.**
-5. **No `gsap.defaults()`.** Declare ease and duration on every tween.
-6. **Local fonts and libraries** for final renders. Public CDNs are fine for drafts.
-7. **View the frames.** Lint passing is not the same as design working.
+## Media tools (`media-use`)
 
-## Render workflow
+- Free and local: TTS (Kokoro), `transcribe` (whisper), music generation, offline SFX set, `remove-background` (text behind the speaker), `beats --json` (beat grid), `normalize-audio`.
+- **Transcribe:** set the model and language explicitly. An English-only model, or the wrong default, can translate non-English speech into English. For Bangla use a multilingual model and proofread every line.
+- **Licence check before client use.** Local music generation models are often non-commercial (MusicGen weights are CC BY-NC). Check each model's licence and record it in `notes.md`.
 
-1. Lint.
-2. Preview and scrub.
-3. Draft render; look at frames.
-4. Render at 4K; downscale with Lanczos for delivery (see `03_AUDIO_ENGINEERING/loudness-and-export/delivery-specs.md`).
-5. Run the QC checklist.
+## Registry blocks
 
-## Gotchas from the kits
+`npx hyperframes catalog --query "whip" --json`, then `npx hyperframes add <name> --json`. Blocks install as editable source in `compositions/`. Use them for speed; tune them to the tone and the variety ledger so the film does not look like the catalogue.
 
-- Fonts with non-Latin glyphs need local subsets.
-- Uppercase CSS transforms change letters in some languages.
-- Live WebGL can stall a headless render; use Canvas 2D fallback.
-- Footage and large renders stay out of Git (use ignored folders or release assets).
-- A progress bar at the bottom makes a brand film look like a screen recording. Leave it out.
+## Where it fits
 
-## Where this fits
-
-Use HyperFrames for motion films, product promos, and animated explainers. Use Remotion when the project is data-driven React. Use ffmpeg for everything around them.
+Default engine for agent-built motion films, captions and graphics over footage, website-to-video, and batch variants. Remotion when the project is already React or Remotion. ffmpeg for everything around them.

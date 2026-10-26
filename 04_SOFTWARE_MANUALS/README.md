@@ -26,10 +26,12 @@ Tool flags and APIs change. Every file here is `verify-first`. When you use a co
 
 | Need | Use |
 |---|---|
-| Programmatic video with React components, data-driven videos, many variations | Remotion |
-| HTML + GSAP motion films that an agent writes and renders to MP4 | HyperFrames |
+| Agent-built motion films, captions and graphics over footage, website-to-video, batch variants (default) | HyperFrames (Apache 2.0) |
+| React projects, existing Remotion code, data-driven variants in React | Remotion (licence: free only up to 3 employees) |
 | Cutting, converting, measuring, batch tasks | ffmpeg |
 | Anything with a heavy visual timeline and hand-tuned grading | A desktop editor (not covered here) |
+
+Both engines ship official agent skills; install commands are in each manual. The manuals here hold house notes and the gotchas that cost us renders.
 
 ## Safety notes
 

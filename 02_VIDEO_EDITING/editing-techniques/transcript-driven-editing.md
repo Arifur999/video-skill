@@ -24,13 +24,7 @@ How to cut talking-head footage using a word-level transcript, so the edit is ti
 
 ## Speech cutting rules
 
-- **A phrase is what you say in one breath.** Cut between phrases at real silence. Never cut inside one.
-- **Keep natural beats.** The short pause after a comma or after "First," makes speech sound human. Pauses between phrases stay under about 0.2 s; beats after a comma or list marker may run 0.2–0.4 s and should stay.
-- **Fillers:** remove a filler only when there is silence on both sides. If it runs straight into the next word, cutting it clips the words around it. Keep it.
-- **Never speed up the voice** to tighten the edit.
-- **Word endings:** transcripts often mark a word's end a little before the consonant fully dies (about 40–80 ms in some tools). Cut after a word has fully decayed.
-- **Two takes join only where both sides are silent.** If they run together, play one take whole.
-- **Fewer cuts, all between phrases, beats many clever micro-cuts.** One case study found the cleaner version ran several seconds longer and sounded better.
+The rules for where and how to cut speech live in `03_AUDIO_ENGINEERING/dialogue-cleanup/speech-cut-hygiene.md`. The short version: a phrase is one breath; cut only between phrases at real silence; keep natural beats; never speed up the voice.
 
 ## Sync safety
 

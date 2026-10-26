@@ -42,6 +42,11 @@ Choose the lightest tool that does the job. Prices, limits, and features change.
 - Proofread names, brands, and numbers.
 - Expect the timestamps to mark word ends a bit early. Cut after the word has decayed.
 - For non-English or mixed-language audio, test a short clip first and pick the tool that handles that language best.
+- **Bangla:** always set the language explicitly. Never use an English-only (`.en`) Whisper model; some tools translate to English when the model or language is wrong. Small multilingual models are weak on Bangla; use a large model or a cloud service with Bengali support, and proofread names, numbers and English loanwords. Bangla-English code-switching often comes back with English words transliterated into Bengali script; decide which script the captions use and fix them consistently.
+
+## Built into the render engines
+
+HyperFrames (`media-use` skill) has local transcription, TTS, music generation, SFX, background removal and beat detection. Remotion has `@remotion/whisper-webgpu` and `@remotion/captions`. Check the licence of each model before client use (see `hyperframes-manual.md`).
 
 ## A minimal toolkit
 

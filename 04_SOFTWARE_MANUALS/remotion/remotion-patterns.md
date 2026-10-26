@@ -35,9 +35,9 @@ Pass a JSON object as props (script lines with start times, caption chunks, bran
 
 ## Pattern: captions from word timestamps
 
-1. Load word-level transcript JSON `[{ text, start, end }]`.
+1. Load captions in the `@remotion/captions` `Caption` shape: `{ text, startMs, endMs, timestampMs, confidence }` (milliseconds; keep the leading space in `text`). `parseSrt()` converts an SRT. Local transcription: `@remotion/whisper-webgpu` (see the `remotion-captions` skill).
 2. Group into 1–3 word chunks on phrase boundaries.
-3. For each chunk, render inside a `<Sequence from={startFrame - 2} durationInFrames={...}>` (show 2 frames early).
+3. Render the captions inside the same `<Sequence>` as their `<Video>` so they share its clock. Show each chunk about 2 frames before its first word (our house rule, not a Remotion rule).
 4. Style from one caption component. See `02_VIDEO_EDITING/captions-and-titles/caption-style-rules.md`.
 
 ## Pattern: beat grid

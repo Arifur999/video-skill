@@ -18,18 +18,9 @@ The agent does the production work. **You bring taste at the gates.** That split
 
 ## Stage 1: Brief
 
-Capture before any design:
+Run the intake in `00_INTAKE/intake-questionnaire.md` and write `brief.md` from `00_INTAKE/project-brief-template.md`.
 
-- Goal (one sentence) and the one action the viewer should take
-- Audience and where it will play (platform, aspect ratio, length)
-- Message and tone (use the tone sentence)
-- Product or subject, with any real UI or assets available
-- Must-include and must-avoid
-- References the client loves (with credit; see the reference credit policy)
-- Voiceover, music, or silent
-- Deadline and delivery formats
-
-**Gate:** the brief is approved in writing.
+**Gate:** the brief is approved.
 
 ## Stage 2: Components
 
@@ -43,9 +34,9 @@ Choose a visual language (palette, type, texture, motion style) that fits the to
 
 1. Write the tone sentence at the top.
 2. Fill the **ledger**, one row per shot: time range, what happens, tone, entrance, transition out, ease, direction, camera, accent colour, new component or not, notes.
-3. Run the variety checks (see `01_MOTION_DESIGN/transitions-and-camera/seam-design.md`).
-4. Fix the repeats or mark them `motif:`.
-5. Mark any shot that borrows from a reference with `ref:ID`, and list each reference with creator and link.
+3. Mark the one shot that breaks the pattern with `surprise` in its Notes.
+4. Mark any shot that borrows from a reference with `ref:ID`, and add the reference ledger (ID, Creator, Link, What we borrow) below the shot ledger.
+5. Run `python scripts/variety_audit.py storyboard.md` (rules in `01_MOTION_DESIGN/transitions-and-camera/seam-design.md`). Fix every FAIL or mark the repeat `motif:`.
 
 **Gate:** storyboard approved after the creative pass.
 
@@ -66,6 +57,12 @@ Render at the highest source resolution, downscale for delivery, run the QC chec
 | # | Time | Shot | Tone | Entrance | Transition out | Ease | Direction | Camera | Accent | New component? | Notes |
 |---|------|------|------|----------|----------------|------|-----------|--------|--------|----------------|-------|
 | 1 | 0.0–1.2 | | | | | | | | | | |
+
+Accent: up to two colours, comma-separated. Transition out: `cut` for a plain hard cut (not counted as a repeat).
+
+| ID | Creator | Link | What we borrow (grammar only) |
+|----|---------|------|-------------------------------|
+| 01 | | | |
 
 ## Why gates matter
 

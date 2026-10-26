@@ -17,7 +17,7 @@ A seam is where one beat ends and the next starts. Design both sides together.
 2. **Same direction.** An exit upward pairs with an entry from below.
 3. **Match velocity.** The exit ends at the speed the entry begins.
 4. **Match blur.** If the exit ramps to 30 px blur, the entry starts at 30 px and ramps down.
-5. **Fill the slot.** Every timeline must run at least as long as its slot. A shorter timeline can cause the scene to vanish a moment early and flash black. Add a zero-effect tween that spans the full duration.
+5. **Fill the slot.** Every scene's slot must cover the whole time it should be visible. In HyperFrames a timeline that ends early holds its last frame, but a host slot shorter than its video goes blank (lint `subcomposition_blanks_before_host`). In other engines a short timeline can flash black; a zero-effect tween spanning the slot fixes it.
 6. **Cover video edges.** Video elements flicker at start and go black after the source ends. Bracket them with still frames: a poster at the start and a last-frame still after the end.
 
 ## Part 2: variety rules (no two films, or two beats, feel the same)

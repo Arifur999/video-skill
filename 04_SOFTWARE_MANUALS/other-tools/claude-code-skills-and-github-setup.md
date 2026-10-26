@@ -1,5 +1,5 @@
 ---
-title: Claude Code Skills and GitHub Setup (How This Knowledge Base Plugs In)
+title: Skill Install, Maintenance and GitHub Setup
 section: 04_SOFTWARE_MANUALS/other-tools
 type: recipe
 confidence: verify-first
@@ -7,94 +7,49 @@ sources: [herk-edit-kit, saas-motion-kit, own-synthesis]
 updated: 2026-10-26
 ---
 
-# Claude Code skills and GitHub setup
+# Skill install, maintenance and GitHub setup
 
-How the two reference kits structure an agent-run video studio, and how to mirror that here. Verify specifics against current Claude Code docs.
+This knowledge base **is** the `video-production` skill: `SKILL.md` at the root is the entry point, the numbered folders are its references, `scripts/` holds the checks.
 
-## What the reference kits do
+## Install
 
-| Piece | Purpose |
-|---|---|
-| `CLAUDE.md` and `AGENTS.md` at the repo root | Always-loaded project instructions: rules, commands, conventions |
-| `.claude/skills/<skill-name>/SKILL.md` | One skill per job (edit-video, short-form-edit, motion-showreel...). Invoked as `/skill-name` |
-| Mirror for other agents (`.agents/skills`, `.codex`) | The Herk kit keeps skills in sync for both Claude Code and Codex |
-| `docs/` | Human-readable playbooks. Every note becomes a rule |
-| `templates/` | Brief, storyboard, reference ledger templates |
-| `tools/` or `scripts/` | Small scripts: variety audit, silence cutting, preflight checks |
-| `.github/workflows/` | An action that runs the audit on every push |
-| `.gitignore` | Keeps raw footage, renders, and others' reference clips out of the repo |
-| `.env.example` | Names the keys needed; real keys stay untracked |
-| "Use this template" repo setting | Lets you start a new client project with everything in place |
+Claude Code finds personal skills in `~/.claude/skills/<name>/SKILL.md`. Keep one copy of the files (the note-to-rule loop writes back into them) and link it:
 
-## Recommended layout for this ecosystem
-
-```
-video-production-ecosystem/
-├── CLAUDE.md                     # short: points to the KB and lists non-negotiables
-├── .claude/skills/
-│   ├── edit-talking-head/SKILL.md
-│   ├── short-form-reel/SKILL.md
-│   ├── motion-promo/SKILL.md
-│   └── qc-and-deliver/SKILL.md
-├── 08_KNOWLEDGE_BASE/            # this folder (text knowledge)
-├── 09_RESOURCES/                 # later: LUTs, SFX, fonts, sample footage (Git LFS or external)
-├── 10_PROJECTS/                  # per-client, git-ignored or separate repos
-└── templates/
+```powershell
+# Windows: a directory junction needs no admin rights
+New-Item -ItemType Junction -Path "$HOME\.claude\skills\video-production" -Target "<path>\08_KNOWLEDGE_BASE"
 ```
 
-(Numbers 09 and 10 are suggestions. Name them as you like.)
+For one repo only, put the folder (or the junction) at `<repo>/.claude/skills/video-production/` instead.
 
-## Skill design rules
+Companion skills (official, maintained upstream; our manuals defer to them for API detail):
 
-1. **One skill, one job.** The description must say when to use it, in plain words, so the agent can pick it.
-2. **Keep `SKILL.md` short.** It holds the steps and gates. Put knowledge in this base and point to it by path.
-3. **Progressive loading.** The skill names exact files to read at each step (for example: "At step 4 read `tone-matrix.md` and `seam-design.md`"). The agent never loads the whole base.
-4. **Gates.** The skill stops and asks for approval at brief, theme, storyboard, draft, sound, and final.
-5. **Checks as scripts.** Anything measurable (loudness, caption contrast, variety repeats, lip sync frames) becomes a script, not a prompt.
-6. **Every note becomes a rule.** After feedback, update the skill or the KB file. See `05_RESEARCH_NOTES/lessons-learned/note-to-rule-loop.md`.
-
-## SKILL.md skeleton
-
-```markdown
----
-name: short-form-reel
-description: Turn a talking-head recording into a 9:16 reel with hook, captions, B-roll and sound. Use when the user gives a raw recording and asks for a reel or Short.
----
-
-# Short-form reel
-
-## Before you start
-Read: 08_KNOWLEDGE_BASE/02_VIDEO_EDITING/storytelling-and-pacing/short-form-playbook.md
-
-## Steps
-1. Transcribe (word-level). 
-2. Cut retakes and dead air. Read: editing-techniques/transcript-driven-editing.md
-3. Plan story. GATE: show the plan, wait for approval.
-4. Source B-roll. Read: editing-techniques/b-roll-rules.md
-5. Captions. Read: captions-and-titles/caption-style-rules.md
-6. Mix. Read: 03_AUDIO_ENGINEERING/mixing-and-mastering/mix-hierarchy-and-levels.md
-7. QC. Read: editing-techniques/qc-checklist.md. GATE: final watch-through.
-
-## Never
-- Invent numbers or results.
-- Cut inside a phrase.
-- Skip the QC checklist.
+```bash
+npx skills add heygen-com/hyperframes     # HyperFrames
+npx skills add remotion-dev/skills        # Remotion
 ```
+
+Machine requirements: Python 3, Node 22+, FFmpeg on PATH (`winget install Gyan.FFmpeg` on Windows).
+
+## Why one skill and not several
+
+The skill's name and description are always in context; the body loads only when triggered, and reference files only when a step needs them. One skill with tracks keeps the always-on cost to one description and keeps the intake, gates and QC shared. Split a track into its own skill only if it starts being used on its own a lot.
+
+## Maintenance rules
+
+1. Keep `SKILL.md` short: steps, gates, and which file to read at each step. Knowledge goes in the numbered folders.
+2. Anything measurable becomes a script in `scripts/`, not a reminder.
+3. Every note on a draft becomes a rule (`05_RESEARCH_NOTES/lessons-learned/note-to-rule-loop.md`).
+4. After adding or renaming files, run `python scripts/build_index.py` to refresh `knowledge-index.csv` (a catalogue for people; the agent routes through `SKILL.md`).
+5. When an engine updates, re-check its manual against the official skill and update `updated:`.
 
 ## GitHub practices
 
-- Use a **private** repo for client-sensitive material and a public one only for generic knowledge.
-- **Git LFS** for large binary resources (`.gitattributes` with patterns for `.cube`, `.wav`, `.mp3`, `.mp4`, `.psd`, fonts if large). Or keep binaries in cloud storage and store links in `knowledge-index.csv`.
-- Ignore render outputs, raw media, and third-party reference clips.
-- Commit messages that describe the rule changed ("captions: never over the mouth in first 2.5 s").
-- Tag releases when a rule set is stable.
-- Run the index builder in a pre-commit step or a GitHub Action so `knowledge-index.csv` never goes stale.
-- Never commit API keys.
-
-## Using this with a Claude Max plan
-
-Claude Code can run skills and read this repo directly. Usage limits depend on your plan and change over time. Heavy rendering and checking runs on your machine, not on the plan, so keep scripts local and let the model handle planning, writing, and judgement. Check Anthropic's current plan documentation for limits.
+- Private repo for anything client-related; never commit footage, renders, third-party reference clips or API keys (`.gitignore`, `.env` + `.env.example`).
+- Large binary resources (LUTs, SFX, fonts) in Git LFS or cloud storage, not in the skill folder.
+- Commit messages name the rule changed ("captions: never over the mouth in the first 2.5 s").
+- Optional: a GitHub Action that runs `scripts/build_index.py` so the index never goes stale.
 
 ## Licensing hygiene when learning from other kits
 
-Before copying anything from a public kit, check its licence. Take ideas and measurements, rewrite in your words, credit the source, and never copy assets. See `05_RESEARCH_NOTES/technique-breakdowns/reference-credit-policy.md`.
+Check a kit's licence before copying anything. Take ideas and measurements, rewrite in your words, credit the source, never copy assets. See `05_RESEARCH_NOTES/technique-breakdowns/reference-credit-policy.md`.

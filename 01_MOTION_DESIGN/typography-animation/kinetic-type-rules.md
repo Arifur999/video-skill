@@ -52,3 +52,12 @@ Use one emphasis device per line: colour, weight, scale, or a glow. Stacking all
 - Uppercase transforms change letters in some languages (Turkish dotted and dotless i is the classic case). Type display text in uppercase yourself and set the language on each word.
 - Ship the font subsets that cover every glyph you need. Built-in fallbacks silently drop characters.
 - For right-to-left scripts, reverse the stagger direction and test line breaks.
+
+## Bangla (Bengali script)
+
+- **Never split into characters.** Vowel signs (কি, কে) and conjuncts (ক্ষ, স্ত্র) are several code points that render as one shape. Splitting by character breaks them into dotted circles and loose marks. Animate by word; if you need smaller units, split by grapheme cluster (`Intl.Segmenter` with `granularity: "grapheme"`) and still check conjuncts.
+- **Load a Bengali font explicitly** (Noto Sans Bengali, Hind Siliguri, Anek Bangla, Tiro Bangla for serif). Most Latin display fonts have no Bengali glyphs and the fallback will not match the design.
+- Bengali has no capitals. Get emphasis from weight, colour or scale.
+- Leave more line height than for Latin text: the matras and vowel signs above and below need room.
+- Mixed Bangla and English on one line: set each font explicitly and check the two baselines match visually.
+- Render a test still with the longest conjuncts in the script before building the animation.

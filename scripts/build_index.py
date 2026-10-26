@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rebuild knowledge-index.csv from the frontmatter of every .md file.
 
-Run from anywhere:  python 08_KNOWLEDGE_BASE/_tools/build_index.py
+Run from anywhere:  python scripts/build_index.py
 Needs only the Python standard library.
 """
 import csv
@@ -26,7 +26,7 @@ def read_frontmatter(text):
 
 rows, problems = [], []
 for md in sorted(KB.rglob("*.md")):
-    if "_tools" in md.parts:
+    if md.name == "SKILL.md" or {"scripts", "evals"} & set(md.relative_to(KB).parts):
         continue
     meta = read_frontmatter(md.read_text(encoding="utf-8"))
     rel = md.relative_to(KB).as_posix()

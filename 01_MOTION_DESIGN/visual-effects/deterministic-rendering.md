@@ -27,6 +27,7 @@ Code-driven video renders frame by frame, often out of order and in parallel. If
 ## Do not
 
 - `Math.random()`, `Date.now()`, or `performance.now()` in anything that draws.
+- Timers, network fetches, or infinite repeats (`repeat: -1`) inside a composition.
 - Rely on CSS animations or transitions that run on their own clock.
 - Depend on a network font or CDN at final render time. Public CDNs are fine for drafts.
 - Animate `top` or `left`. Use transforms.
@@ -44,7 +45,8 @@ Code-driven video renders frame by frame, often out of order and in parallel. If
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Scene disappears early or flashes black at its end | Timeline shorter than the slot | Add a no-op tween spanning the full slot |
+| Scene disappears early or flashes black at its end | Slot shorter than the visible content, or timeline shorter than the slot | Make the slot span the visible time; pad the timeline with a no-op tween |
+| Final pose missing on the last frame | Tween ends exactly at the end time | Land the end state one frame earlier |
 | Video clip flickers or goes black at the end | Source ends before the slot | Bracket with poster and last-frame stills |
 | Loop jumps at the seam | Non-integer cycles | Use whole cycles per loop; run the loop check |
 | Missing glyphs (ş, ğ, İ) | Font subset lacks them | Ship fonts with the needed subsets locally |

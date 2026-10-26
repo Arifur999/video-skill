@@ -141,6 +141,8 @@ ffmpeg -i in.mp4 -vf "subtitles=captions.srt:force_style='FontName=Montserrat,Fo
 
 For word-by-word styled captions, render them in your composition tool instead.
 
+On Windows the `subtitles` filter needs the drive colon escaped: `subtitles='C\:/proj/captions.srt'`. Simplest: run from the folder that holds the SRT and pass a bare file name. For Bangla subtitles, set `FontName` to an installed Bengali font or the text falls back to boxes.
+
 ## Overlay with timing
 
 ```bash

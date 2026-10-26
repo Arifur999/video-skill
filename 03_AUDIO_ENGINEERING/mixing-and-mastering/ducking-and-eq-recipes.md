@@ -38,7 +38,7 @@ High-pass at 80 Hz, a small dip near 300 Hz, a small lift near 3.5 kHz. Always A
 ffmpeg -i mix.wav -af "alimiter=limit=0.84:attack=5:release=50" mix_limited.wav
 ```
 
-The `limit` value is linear. 0.84 is about −1.5 dBFS. Run loudness normalisation after (see `loudness-and-export/loudness-targets.md`), then check true peak.
+The `limit` value is linear. 0.84 is about −1.5 dBFS. `alimiter` catches sample peaks, not true peaks, so encoded files can still overshoot. Run loudness normalisation after (see `loudness-and-export/loudness-targets.md`), then check true peak on the encoded file.
 
 ## Recipe 4: Rough de-esser idea
 
