@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: motion-promo-storyboard
+expected_outcome: |
+  Writes storyboard.md with a tone sentence and a shot ledger whose times add up to about 20 seconds, varied transitions, entrances, eases and directions with one shot marked as the surprise, uses only the given claims, runs or applies the variety check, and stops for storyboard approval instead of building.

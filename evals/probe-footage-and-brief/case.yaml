@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: probe-footage-and-brief
+expected_outcome: |
+  Measures the footage with a probe instead of asking, reports the mono, 720p and 44.1 kHz problems on the B-roll clip in plain words, writes brief.md with the given answers and marks guessed fields as assumed, flags Bangla font and transcription needs, and stops for brief approval without building.

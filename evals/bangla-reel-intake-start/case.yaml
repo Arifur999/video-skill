@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: bangla-reel-intake-start
+expected_outcome: |
+  Replies in Banglish, asks a short first round of intake questions (at most four, with options where possible) about the job, does not ask about specs that can be measured from files, asks for file paths, and does not start building.

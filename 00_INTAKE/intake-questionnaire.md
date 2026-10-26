@@ -23,6 +23,8 @@ The brief decides most of the quality. A wrong guess here costs a rebuild later;
 
 ## Round 1: the job
 
+If the user already says they have footage or other materials, make the path one of the four questions here, so you can probe the files while they answer the rest.
+
 | Ask | Why it matters | Options to offer |
 |---|---|---|
 | What are we making? | Picks the track and the playbook | Reel/Short from my recording · YouTube video edit · Promo/ad · Explainer · Motion graphic/logo · Other |

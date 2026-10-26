@@ -23,13 +23,20 @@ These protect the user's reputation and the client's. Each has burned someone be
 6. **Look at frames.** A passing lint or a clean transcript is not a review. Look at snapshots and contact sheets before showing a draft.
 7. **Never overwrite the user's source files.** Write new files; keep originals untouched.
 
+## Bangla and other non-Latin text
+
+Most projects here have Bangla voice or text, and three things break silently. Raise them at intake and plan for them in the storyboard, not at render time:
+- **Font:** load a Bengali font explicitly (render engines and most display fonts have none).
+- **Animation:** never animate Bangla letter by letter; vowel signs and conjuncts break. Animate by word (details: `01_MOTION_DESIGN/typography-animation/kinetic-type-rules.md`, Bangla section).
+- **Transcription:** set the language and use a multilingual model; proofread every caption.
+
 ## Stage 0: intake (always first)
 
 Follow `00_INTAKE/intake-questionnaire.md`. In short:
 
 1. Read what the user already gave (message, files, links). Do not ask for anything you can find out.
 2. Ask the missing questions in short rounds (at most 4 per round, choices where possible).
-3. When you get file paths, run `python scripts/probe_assets.py <paths>` and read the flags (VFR, HDR, mono, low resolution) instead of asking about specs. Use `--scenes` on reference clips to measure their pace.
+3. When you get file paths, run `python scripts/probe_assets.py <paths>` instead of asking about specs, and tell the user every flag it raises in plain words (VFR, HDR, mono, sample rate, low resolution) with what you will do about it. Also look at a few frames: a probe cannot tell you the footage is the wrong clip. Use `--scenes` on reference clips to measure their pace.
 4. Write `brief.md` in the project folder from `00_INTAKE/project-brief-template.md`. Mark anything you assumed as `(assumed)`.
 5. **Gate:** show a short brief summary and the plan (track, engine, gates). Wait for approval.
 
@@ -97,7 +104,7 @@ Create this inside the folder the user names. Reference the user's footage where
 ```
 <project>/
 ├── brief.md          intake result
-├── inventory.md      probe_assets.py output
+├── inventory.md      probe_assets.py output (only when there are input files)
 ├── storyboard.md     beats or ledger, plus reference ledger
 ├── notes.md          decisions, licences, versions, open questions
 ├── build/            HyperFrames or Remotion project

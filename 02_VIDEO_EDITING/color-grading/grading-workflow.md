@@ -1,4 +1,6 @@
----
+git remote set-url origin https://github.com/Arifur999/video-skill.git
+git remote -v
+git push -u origin main---
 title: Colour Grading Workflow
 section: 02_VIDEO_EDITING/color-grading
 type: recipe
